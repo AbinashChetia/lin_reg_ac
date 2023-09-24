@@ -9,9 +9,11 @@ class CrossVald:
         self.monte_carlo = monte_carlo
         self.k_fold = k_fold
 
-    def fit(self, X, y, lr, max_iter, iter_step, eps, stochGD=False):
+    def fit(self, X, y, lr, max_iter, iter_step, eps, stochGD=False, w_hist=False):
+        if w_hist and (self.option == 'monte_carlo' or self.option == 'k_fold'):
+            raise ValueError('w_hist is not yet supported for Monte Carlo Cross Validation and K-Fold Cross Validation.')
         if self.option == 'holdout':
-            return self.__holdoutAC(X, y, lr, max_iter, iter_step, eps, stochGD)
+            return self.__holdoutAC(X, y, lr, max_iter, iter_step, eps, stochGD, w_hist)
         elif self.option == 'monte_carlo':
             return self.__monte_carlo(X, y, lr, max_iter, iter_step, eps, stochGD)
         elif self.option == 'k_fold':
@@ -19,11 +21,12 @@ class CrossVald:
         else:
             raise ValueError('Unknown option!')
 
-    def __holdoutAC(self, X, y, lr, max_iter, iter_step, eps, stochGD=False):
+    def __holdoutAC(self, X, y, lr, max_iter, iter_step, eps, stochGD=False, w_hist=False):
         if self.option != 'holdout':
             raise ValueError('Unknown option!')
         print('Implementing Holdout Cross Validation.')
         train_costs = []
+        w_hists = []
         opt_model = {'rmse': 1e8, 'lr': 0, 'w': None}
         for l in lr:
             train_x, train_y, test_x, test_y = utilsAC.splitTrainTest(X, y, 0.7)
@@ -31,15 +34,19 @@ class CrossVald:
             test_x = utilsAC.normMinMax(test_x, mode='test', train_min=train_min, train_max=train_max)
             print(f'----------------- lr : {l} -----------------')
             linReg = linRegAC.LinReg(lr=l, max_iter=max_iter, eps=eps, stochGD=stochGD)
-            linReg.fit(train_x, train_y, iter_step=iter_step)
+            linReg.fit(train_x, train_y, iter_step=iter_step, w_hist=w_hist)
             pred = linReg.predict(test_x)
             rmse_temp = utilsAC.getRmse(test_y, pred)
             print(f'MSE: {utilsAC.getMse(test_y, pred)}, RMSE: {rmse_temp}')
             train_costs.append(linReg.get_train_cost())
+            if w_hist:
+                w_hists.append(linReg.get_w_hists())
             if rmse_temp < opt_model['rmse']:
                 opt_model['rmse'] = rmse_temp
                 opt_model['lr'] = l
                 opt_model['w'] = linReg.get_params()
+        if w_hist:
+            return train_costs, w_hists, opt_model
         return train_costs, opt_model
     
     def __monte_carlo(self, X, y, lr, max_iter, iter_step, eps, stochGD=False):

@@ -10,16 +10,17 @@ class LinReg:
         self.eps = eps
         self.stochGD = stochGD
         self.train_cost = []
+        self.w_hists = []
         self.modes_dict = {1: 'using Normal equation w = (X^T X)^-1 X^T y', 2: 'using Gradient descent w = w - lr * grad, for overdetermined system', 3: 'using equation w = X^T (X X^T)^-1 y, for underdetermined system'}
 
-    def fit(self, X, y, iter_step=1):
+    def fit(self, X, y, iter_step=1, w_hist=False):
         m, n = X.shape
         if m > n + 1:
             if self.mode == 1:
                 self.__fit1(X, y)
             else:
                 self.mode = 2
-                self.__fit2(X, y, iter_step)
+                self.__fit2(X, y, iter_step, w_hist)
         elif m < n + 1:
             self.mode = 3
             self.__fit3(X, y)
@@ -37,18 +38,18 @@ class LinReg:
             raise ValueError('Singular matrix, cannot find inverse. No solution for the given problem.')
         self.w = np.dot((np.linalg.inv(np.dot(x_mat.T, x_mat))), np.dot(x_mat.T, y_mat))
         
-    def __fit2(self, X, y, iter_step=1):
+    def __fit2(self, X, y, iter_step=1, w_hist=False):
         '''
         Implementing Gradient descent w = w - lr * grad, for overdetermined system
         '''
         if self.mode != 2:
             raise ValueError('Mode not matching or not specified yet.')
         if self.stochGD:
-            return self.__stochGradDesc(X, y, iter_step)
+            return self.__stochGradDesc(X, y, iter_step, w_hist)
         else:
-            return self.__batchGradDesc(X, y, iter_step)
+            return self.__batchGradDesc(X, y, iter_step, w_hist)
 
-    def __stochGradDesc(self, X, y, iter_step=1):
+    def __stochGradDesc(self, X, y, iter_step=1, w_hist=False):
         '''
         Implementing Stochastic Gradient descent
         '''
@@ -68,11 +69,15 @@ class LinReg:
                 print(f'Iteration {_ + 1:4d} | Loss = {getRmse(pred_all, y):.4f}')
             if self.__check_convergence(w_new):
                 self.w = w_new
+                if w_hist:
+                    self.w_hists.append(self.w)
                 print(f'Stopping criteria satisfied at iteration {_ + 1}.')
                 break
+            if w_hist:
+                self.w_hists.append(self.w)
             self.w = w_new
 
-    def __batchGradDesc(self, X, y, iter_step=1):
+    def __batchGradDesc(self, X, y, iter_step=1, w_hist=False):
         '''
         Implementing Batch Gradient descent
         '''
@@ -89,8 +94,12 @@ class LinReg:
                 print(f'Iteration {_ + 1:4d} | Loss = {getRmse(pred, y):.4f}')
             if self.__check_convergence(w_new):
                 self.w = w_new
+                if w_hist:
+                    self.w_hists.append(self.w)
                 print(f'Stopping criteria satisfied at iteration {_ + 1}.')
                 break
+            if w_hist:
+                self.w_hists.append(self.w)
             self.w = w_new
 
     def __fit3(self, X, y):
@@ -142,3 +151,6 @@ class LinReg:
 
     def get_train_cost(self):
         return self.train_cost
+    
+    def get_w_hists(self):
+        return self.w_hists
