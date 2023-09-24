@@ -108,9 +108,9 @@ class CrossVald:
                 linReg.fit(train_x, train_y, iter_step=iter_step)
                 pred = linReg.predict(test_x)
                 kfold_rmse.append(utilsAC.getRmse(test_y, pred))
-                print(f'MSE: {utilsAC.getMse(test_y, pred)}, RMSE: {kfold_rmse}')
+                print(f'MSE: {utilsAC.getMse(test_y, pred)}, RMSE: {utilsAC.getRmse(test_y, pred)}')
                 kfold_train_costs.append(linReg.get_train_cost())
-            train_costs.append(linReg.get_train_cost())
+            train_costs.append(kfold_train_costs)
             rmse_temp = np.mean(kfold_rmse)
             if rmse_temp < opt_model['rmse']:
                 opt_model['rmse'] = rmse_temp
