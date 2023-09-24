@@ -24,7 +24,7 @@ class CrossVald:
             raise ValueError('Unknown option!')
         print('Implementing Holdout Cross Validation.')
         train_costs = []
-        opt_model = {'rmse': 1e8, 'lr': 0}
+        opt_model = {'rmse': 1e8, 'lr': 0, 'w': None}
         for l in lr:
             train_x, train_y, test_x, test_y = utilsAC.splitTrainTest(X, y, 0.7)
             train_x, train_min, train_max = utilsAC.normMinMax(train_x, mode='train')
@@ -39,6 +39,7 @@ class CrossVald:
             if rmse_temp < opt_model['rmse']:
                 opt_model['rmse'] = rmse_temp
                 opt_model['lr'] = l
+                opt_model['w'] = linReg.get_params()
         return train_costs, opt_model
     
     def __monte_carlo(self, X, y, lr, max_iter, iter_step, eps, stochGD=False):
@@ -48,7 +49,7 @@ class CrossVald:
             raise ValueError('Number of iterations for Monte Carlo Cross Validation not specified!')
         print('Implementing Monte Carlo Cross Validation.')
         train_costs = []
-        opt_model = {'rmse': 1e8, 'lr': 0}
+        opt_model = {'rmse': 1e8, 'lr': 0, 'w': None}
         for l in lr:
             montc_train_costs = []
             montc_rmse = []
@@ -68,6 +69,7 @@ class CrossVald:
             if rmse_temp < opt_model['rmse']:
                 opt_model['rmse'] = rmse_temp
                 opt_model['lr'] = l
+                opt_model['w'] = linReg.get_params()
         return train_costs, opt_model
     
     def __k_fold(self, X, y, lr, max_iter, iter_step, eps, stochGD=False):
@@ -77,7 +79,7 @@ class CrossVald:
             raise ValueError('Number of folds for K-Fold Cross Validation not specified!')
         print('Implementing K-Fold Cross Validation.')
         train_costs = []
-        opt_model = {'rmse': 1e8, 'lr': 0}
+        opt_model = {'rmse': 1e8, 'lr': 0, 'w': None}
         for l in lr:
             kfold_train_costs = []
             kfold_rmse = []
@@ -106,4 +108,5 @@ class CrossVald:
             if rmse_temp < opt_model['rmse']:
                 opt_model['rmse'] = rmse_temp
                 opt_model['lr'] = l
+                opt_model['w'] = linReg.get_params()
         return train_costs, opt_model
