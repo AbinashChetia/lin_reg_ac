@@ -83,7 +83,7 @@ class CrossVald:
         for l in lr:
             kfold_train_costs = []
             kfold_rmse = []
-            data_folds = utilsAC.splitTrainTest_kfold(X, y, self.k_fold)
+            data_folds = utilsAC.split_kfold(X, y, self.k_fold)
             for i in range(self.k_fold):
                 train_x = pd.DataFrame()
                 train_y = pd.Series()

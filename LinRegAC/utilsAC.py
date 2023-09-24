@@ -17,7 +17,7 @@ def splitTrainTest(x, y, train_ratio=0.8):
     test_y = df.iloc[train_size:, -1]
     return train_x, train_y, test_x, test_y
 
-def splitTrainTest_kfold(x, y, k=5):
+def split_kfold(x, y, k=5):
     '''
     Split data into training and testing sets for k-fold cross validation.
     '''
