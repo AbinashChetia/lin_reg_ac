@@ -10,7 +10,7 @@ class CrossVald:
         self.k_fold = k_fold
 
     def fit(self, X, y, lr, max_iter, iter_step, eps, stochGD=False, w_hist=False):
-        if w_hist and (self.option == 'monte_carlo' or self.option == 'k_fold'):
+        if w_hist and (self.option == 'monte_carlo' or self.option == 'k_fold') and self.option != 'holdout':
             raise ValueError('w_hist is not yet supported for Monte Carlo Cross Validation and K-Fold Cross Validation.')
         if self.option == 'holdout':
             return self.__holdoutAC(X, y, lr, max_iter, iter_step, eps, stochGD, w_hist)
