@@ -115,7 +115,7 @@ class LinReg:
         self.w = np.dot(x_mat.T, np.dot(np.linalg.inv(np.dot(x_mat, x_mat.T)), y_mat))
 
     def __calc_grad(self, X, y, pred): # grad = (y - pred) * X
-        if type(pred) == np.int64 or type(pred) == np.float64:
+        if self.stochGD:
             return np.dot(y - pred, X)
         return np.dot(y.to_numpy().flatten() - pred, X)
     
