@@ -11,10 +11,10 @@ def splitTrainTest(x, y, train_ratio=0.8):
     df = pd.concat([df_x, df_y], axis=1)
     df = df.sample(frac=1).reset_index(drop=True)
     train_size = int(len(df) * train_ratio)
-    train_x = df.iloc[:train_size, :-1]
-    train_y = df.iloc[:train_size, -1]
-    test_x = df.iloc[train_size:, :-1]
-    test_y = df.iloc[train_size:, -1]
+    train_x = df.iloc[:train_size, :-1].reset_index(drop=True)
+    train_y = df.iloc[:train_size, -1].reset_index(drop=True)
+    test_x = df.iloc[train_size:, :-1].reset_index(drop=True)
+    test_y = df.iloc[train_size:, -1].reset_index(drop=True)
     return train_x, train_y, test_x, test_y
 
 def split_kfold(x, y, k=5):
