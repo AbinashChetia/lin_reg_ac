@@ -71,6 +71,7 @@ class LinReg:
                 self.w = w_new
                 if w_hist:
                     self.w_hists.append(self.w)
+                self.train_cost.append(getRmse(pred_all, y))
                 print(f'Stopping criteria satisfied at iteration {_ + 1}.')
                 break
             if w_hist:
@@ -96,6 +97,7 @@ class LinReg:
                 self.w = w_new
                 if w_hist:
                     self.w_hists.append(self.w)
+                self.train_cost.append(getRmse(pred, y))
                 print(f'Stopping criteria satisfied at iteration {_ + 1}.')
                 break
             if w_hist:
